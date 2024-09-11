@@ -8,12 +8,21 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MainController extends AbstractController
 {
-    #[Route('/', name: 'app_main')]
+    #[Route('/', name: 'homepage')]
     public function index(): Response
     {
         return $this->render('main/index.html.twig', [
             'title' => 'Homepage',
             'homepage_text' => "Nous sommes le ".date('d/m/Y \à H:i'),
+        ]);
+    }
+
+    #[Route('/about', name: 'about_me')]
+    public function aboutMe(): Response
+    {
+        return $this->render('main/about.html.twig', [
+            'title' => 'About me Baby',
+            'homepage_text' => "Et C'est moi !",
         ]);
     }
 }
