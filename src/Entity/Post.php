@@ -20,6 +20,12 @@ class Post
     #[ORM\Column(type: Types::TEXT)]
     private ?string $postText = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $postDateCreated = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $postDatePublished = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -45,6 +51,30 @@ class Post
     public function setPostText(string $postText): static
     {
         $this->postText = $postText;
+
+        return $this;
+    }
+
+    public function getPostDateCreated(): ?\DateTimeInterface
+    {
+        return $this->postDateCreated;
+    }
+
+    public function setPostDateCreated(\DateTimeInterface $postDateCreated): static
+    {
+        $this->postDateCreated = $postDateCreated;
+
+        return $this;
+    }
+
+    public function getPostDatePublished(): ?\DateTimeInterface
+    {
+        return $this->postDatePublished;
+    }
+
+    public function setPostDatePublished(?\DateTimeInterface $postDatePublished): static
+    {
+        $this->postDatePublished = $postDatePublished;
 
         return $this;
     }
