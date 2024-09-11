@@ -11,7 +11,11 @@ class Post
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(
+        options:[
+            "unsigned" => true,
+        ]
+    )]
     private ?int $id = null;
 
     #[ORM\Column(length: 160)]
@@ -20,13 +24,22 @@ class Post
     #[ORM\Column(type: Types::TEXT)]
     private ?string $postText = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE,
+        options: [
+            'default' => 'CURRENT_TIMESTAMP',
+    ]
+    )]
     private ?\DateTimeInterface $postDateCreated = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $postDatePublished = null;
 
-    #[ORM\Column]
+    #[ORM\Column(
+        type:Types::BOOLEAN,
+        options: [
+            'default' => false,
+        ]
+    )]
     private ?bool $postIsPublished = null;
 
     public function getId(): ?int
