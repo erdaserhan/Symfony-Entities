@@ -26,6 +26,9 @@ class Post
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $postDatePublished = null;
 
+    #[ORM\Column]
+    private ?bool $postIsPublished = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Post
     public function setPostDatePublished(?\DateTimeInterface $postDatePublished): static
     {
         $this->postDatePublished = $postDatePublished;
+
+        return $this;
+    }
+
+    public function isPostIsPublished(): ?bool
+    {
+        return $this->postIsPublished;
+    }
+
+    public function setPostIsPublished(bool $postIsPublished): static
+    {
+        $this->postIsPublished = $postIsPublished;
 
         return $this;
     }
