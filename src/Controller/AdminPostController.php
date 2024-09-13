@@ -29,6 +29,8 @@ final class AdminPostController extends AbstractController
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
+        $post->setPostIsPublished(false);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($post);
             $entityManager->flush();
