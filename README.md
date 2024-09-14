@@ -63,3 +63,28 @@ On va vérifier la route par défaut
     }
 # ...
 ```
+
+Et de la vue (qui peut gérer la variable title contenant Homepage, et d'autres) :
+
+```twig
+{# templates/main/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+    <p>{{ homepage_text }}</p>
+{% endblock %}
+```
+
+On peut accéder à l'accueil depuis la racine de notre
+
+https://127.0.0.1:8000
+
+#### Modifications de `MainController`
+
+Pour obtenir 2 pages, homepage et about
+
+```php
+<?php
