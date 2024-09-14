@@ -186,3 +186,30 @@ en
     APP_SECRET=une_autre_clef_secrete_sécurité
 
 si vous retapez  `php bin/console debug:route`
+
+Vous ne trouverez plus que les routes de production
+
+Dans le fichier `.env.local`
+
+Trouvez la ligne de base de données :
+
+```bash
+# ne pas oublier de remettre en dev
+APP_ENV=dev
+
+# DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=8.0.32&charset=utf8mb4"
+# DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
+DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
+```
+
+Commentez la ligne postgresql et décommentez la ligne mysql
+
+Passez vos paramètres de connexion dans l'ordre
+
+driver://utilisateur:mot_de_passe@ip_serveur:port/nomdelaDB?options
+
+```bash
+DATABASE_URL="mysql://root:@127.0.0.1:3306/mysecondesymfonyc1?serverVersion=8.0.31&charset=utf8mb4"
+# DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
+# DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
+```
