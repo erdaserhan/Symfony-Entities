@@ -139,3 +139,50 @@ templates/main/menu.html.twig
     <a href="{{ path('about_me') }}">About me</a>
 </nav>
 ```
+
+#### Modification de index.html.twig
+
+documentation de `parent` :
+
+https://twig.symfony.com/doc/3.x/functions/parent.html
+
+
+```twig
+{% extends 'base.html.twig' %}
+
+{# on surcharge le block parent #}
+{% block title %}{{ parent() }} | {{ title }}{% endblock %}
+
+
+{% block body %}
+    <div class="container">
+        <h1>{{ title }}</h1>
+{# inclusion depuis la racine du projet ! (templates) #}
+{% include 'main/menu.html.twig' %}
+    </div>
+
+{% endblock %}
+```
+
+About est similaire.
+
+## Création de notre `.env.local`
+
+Le fichier `.env` est le fichier de configuration qui est mis sur `git` et donc `github`
+
+C'est pour celà que nous allons le copier sous le nom de `.env.local`
+
+    cp .env .env.local
+
+Ouvrez `.env.local`
+
+Changez cette ligne
+
+    APP_ENV=dev
+    APP_SECRET=c6f06c078199d1f00879e1b9c146cddf
+en
+
+    APP_ENV=prod
+    APP_SECRET=une_autre_clef_secrete_sécurité
+
+si vous retapez  `php bin/console debug:route`
