@@ -241,3 +241,93 @@ Une entité est la représentation objet d'un élément de sauvegarde de donnée
 ```
 
 Avec seulement l'id de la classe Post
+
+## Première migration
+
+    php bin/console make:migration
+
+    success :  created: migrations/Version20240911133839.php
+
+puis
+
+    php bin/console doctrine:migrations:migrate
+
+## Ajout de champs à l'entité `Post`
+
+On utilise maker pour ça
+
+    php bin/console make:entity Post
+
+```bash
+php bin/console make:entity Post
+ Your entity already exists! So let's add some new fields!
+
+ New property name (press <return> to stop adding fields):
+ > postTitle
+
+ Field type (enter ? to see all types) [string]:
+ >
+
+
+ Field length [255]:
+ > 160
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ >
+
+ updated: src/Entity/Post.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > postText
+
+ Field type (enter ? to see all types) [string]:
+ > text
+text
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ >
+
+ updated: src/Entity/Post.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > postDateCreated
+
+ Field type (enter ? to see all types) [string]:
+ > datetime
+datetime
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ >
+
+ updated: src/Entity/Post.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > postDatePublished
+
+ Field type (enter ? to see all types) [string]:
+ > datetime
+datetime
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ > yes
+
+ updated: src/Entity/Post.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > postIsPublished
+
+ Field type (enter ? to see all types) [string]:
+ > boolean
+boolean
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ >
+
+ updated: src/Entity/Post.php
+```
+
+Ce qui nous crée le fichier suivant :
+
+```php
+// src/Entity/Post.php
+
