@@ -88,3 +88,54 @@ Pour obtenir 2 pages, homepage et about
 
 ```php
 <?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+class HomeController extends AbstractController
+{
+    #[Route('/', name: 'homepage')]
+    public function index(): Response
+    {
+        return $this->render('main/index.html.twig', [
+            'title' => 'Homepage',
+            'homepage_text'=> "Nous somme le ".date('d/m/Y \à H:i'),
+        ]);
+    }
+    #[Route('/about', name: 'about_me')]
+    public function aboutMe(): Response
+    {
+        return $this->render('main/about.html.twig', [
+            'title' => 'About me',
+            'homepage_text'=> "Et je parle encore de moi !",
+        ]);
+    }
+}
+
+```
+
+#### Modification de base.html.twig
+
+```twig
+{# templates/base.html.twig #}
+{# ... #}
+<title>{% block title %}EntitiesG1{% endblock %}</title>
+{# ... #}
+```
+
+#### Création de menu.html.twig
+
+Nous utilisons path() pôur les liens vers les noms de routes pour pouvoir les changer à un seul endroit : `src/controller`
+
+templates/main/menu.html.twig
+
+```twig
+<nav>
+    {# on utilise path('nom_du_chemin') lorsqu'on veut un lien vers une page #}
+    <a href="{{ path('homepage') }}">Homepage</a>
+    <a href="{{ path('about_me') }}">About me</a>
+</nav>
+```
