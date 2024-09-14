@@ -486,3 +486,135 @@ Si c'est le cas, il va créer un fichier de migration comme
 puis
 
     php bin/console d:m:m
+
+    ### Remplissage de Section
+
+    php bin/console make:entity Section
+
+```php
+# ...
+#[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(
+        # On souhaite ne pas perdre la moitié
+        # des numériques... donc unsigned !
+        options: [
+            'unsigned' => true,
+        ]
+    )]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 120)]
+    private ?string $sectionTitle = null;
+
+    #[ORM\Column(length: 600, nullable: true)]
+    private ?string $sectionDescription = null;
+# ...
+```
+
+### Jointure de Post vers Section
+
+Jointure en `ManyToMany`, le choix de la table mère - enfant est faite lors de la création de la jointure, même si le `manytomany` est en principe `bidirectionel`
+
+On va choisir le `parent` Post
+
+    php bin/console make:entity Post
+
+```bash
+php bin/console make:entity Post
+ Your entity already exists! So let's add some new fields!
+
+ New property name (press <return> to stop adding fields):
+ > sections
+
+ Field type (enter ? to see all types) [string]:
+ 
+ > ManyToMany
+ManyToMany
+
+ What class should this entity be related to?:
+ > Section
+Section
+
+ Do you want to add a new property to Section so that you can access/update Post objects from it - e.g. $section->getPosts()? (yes/no) [yes]:
+ >
+
+ A new property will also be added to the Section class so that you can access the related Post objects from it.
+
+ New field name inside Section [posts]:
+ >
+
+ updated: src/Entity/Post.php
+ updated: src/Entity/Section.php
+
+```
+
+Dans `src/Entity/Post.php`
+
+```php
+<?php
+
+namespace App\Entity;
+
+use App\Repository\PostRepository;
+# utilisation des ArrayCollection et des Collections
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+# ...
+
+    /**
+     * Jointure many to many vers Section. Cet attribut est le parent et 
+     * est inversée par l'attribut de Section `posts`.
+     Ce many to many est bidirectionnel, pourtant, Post est le responsable de Section 
+     * @var Collection<int, Section>
+     */
+    #[ORM\ManyToMany(targetEntity: Section::class, inversedBy: 'posts')]
+    private Collection $sections;
+
+    # un constructeur est créé.
+    public function __construct()
+    {
+        # il nous permet d'initialiser le tableau de type Collection
+        # pour éventuelles Sections
+        $this->sections = new ArrayCollection();
+    }
+
+   # ... getters and setters
+
+    /**
+     * Si on veut récupérer les sections depuis le Post
+     * @return Collection<int, Section>
+     */
+    public function getSections(): Collection
+    {
+        return $this->sections;
+    }
+
+    // on veut rajouter des sections au Post actuel (update ou post)
+    public function addSection(Section $section): static
+    {
+        if (!$this->sections->contains($section)) {
+            $this->sections->add($section);
+        }
+
+        return $this;
+    }
+
+    // on veut pouvoir supprimer les sections depuis un Post
+    public function removeSection(Section $section): static
+    {
+        $this->sections->removeElement($section);
+
+        return $this;
+    }
+}
+
+```
+
+Et dans Dans `src/Entity/Section.php`
+
+```php
+<?php
+
+#...
