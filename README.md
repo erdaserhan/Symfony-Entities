@@ -331,3 +331,158 @@ Ce qui nous crée le fichier suivant :
 ```php
 // src/Entity/Post.php
 
+<?php
+
+namespace App\Entity;
+
+use App\Repository\PostRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: PostRepository::class)]
+class Post
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 160)]
+    private ?string $postTitle = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $postText = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $postDateCreated = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $postDatePublished = null;
+
+    #[ORM\Column]
+    private ?bool $postIsPublished = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getPostTitle(): ?string
+    {
+        return $this->postTitle;
+    }
+
+    public function setPostTitle(string $postTitle): static
+    {
+        $this->postTitle = $postTitle;
+
+        return $this;
+    }
+
+    public function getPostText(): ?string
+    {
+        return $this->postText;
+    }
+
+    public function setPostText(string $postText): static
+    {
+        $this->postText = $postText;
+
+        return $this;
+    }
+
+    public function getPostDateCreated(): ?\DateTimeInterface
+    {
+        return $this->postDateCreated;
+    }
+
+    public function setPostDateCreated(\DateTimeInterface $postDateCreated): static
+    {
+        $this->postDateCreated = $postDateCreated;
+
+        return $this;
+    }
+
+    public function getPostDatePublished(): ?\DateTimeInterface
+    {
+        return $this->postDatePublished;
+    }
+
+    public function setPostDatePublished(?\DateTimeInterface $postDatePublished): static
+    {
+        $this->postDatePublished = $postDatePublished;
+
+        return $this;
+    }
+
+    public function isPostIsPublished(): ?bool
+    {
+        return $this->postIsPublished;
+    }
+
+    public function setPostIsPublished(bool $postIsPublished): static
+    {
+        $this->postIsPublished = $postIsPublished;
+
+        return $this;
+    }
+}
+
+
+```
+
+## Deuxième migration
+
+    php bin/console make:migration
+
+ou
+
+    php bin/console m:mi
+
+puis
+
+    php bin/console doctrine:migrations:migrate
+
+ou
+
+    php bin/console d:m:m
+
+### On veut adapter la table à MySQL
+
+La documentation sur les colonnes (champs) dans `Doctrine` :
+
+https://www.doctrine-project.org/projects/doctrine-orm/en/3.2/reference/attributes-reference.html#attrref_column
+
+
+
+```php
+
+php bin/console m:mi
+php bin/console d:m:m
+```
+
+Faire la migration
+
+Vous pouvez migrer vers la DB, et voir le format colle à vos exigences MySQL en regardant la DB
+
+### Création de nos tables
+
+La table `Post` existe déjà, on va créer les tables suivantes, vides par défaut (mise à part l'id)
+
+    php bin/console make:entity Section
+    php bin/console make:entity Comment
+    php bin/console make:entity Tag
+
+Nous effectuons une nouvelle migration.
+
+On peut voir si on en a besoin avec
+
+    php bin/console doctrine:migrations:diff
+
+Si c'est le cas, il va créer un fichier de migration comme
+
+    php bin/console make:migration
+
+puis
+
+    php bin/console d:m:m
