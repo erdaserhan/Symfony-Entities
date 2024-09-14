@@ -618,3 +618,109 @@ Et dans Dans `src/Entity/Section.php`
 <?php
 
 #...
+
+
+  /**
+     *  Relation M2M vers Post, mais on voit que le 'parent' mappedBy: est
+     *  l'attribut sections se trouvant dans POST, c'est l'enfant
+     * @var Collection<int, Post>
+     */
+    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: 'sections')]
+    private Collection $posts;
+
+    public function __construct()
+    {
+        $this->posts = new ArrayCollection();
+    }
+
+   /*
+    * Mêmes méthodes que de POST, mais pour récupérer, ajouter supprimer des
+    * post depuis Section
+    */
+    /**
+     * @return Collection<int, Post>
+     */
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(Post $post): static
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->addSection($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(Post $post): static
+    {
+        if ($this->posts->removeElement($post)) {
+            $post->removeSection($this);
+        }
+
+        return $this;
+    }
+}
+
+```
+
+### Création d'un tag en git
+
+    git tag -a v0.1 -m "Post M2M Section"
+    git push origin v0.1
+
+[tag v.0.1](https://github.com/WebDevCF2m2023/EntitiesG1/releases/tag/v0.1)
+
+### CRUD de Post et Section
+
+Nous allons les faire dans une nouvelle branche, car nous n'en aurons pas besoin immédiatement :
+
+    
+
+### Mise en forme des formulaires et des pages avec `bootstrap`
+
+Nous allons utiliser les assets qui se trouvent dans le dossier `assets`
+
+Documentation :
+
+Différence AssetMapper et Webpack Encore : https://symfony.com/doc/6.4/frontend.html#using-php-twig
+
+### `AssetMapper`
+
+Documentation : https://symfony.com/doc/6.4/frontend/asset_mapper.html
+
+On va importer bootstrap
+
+    php bin/console importmap:require bootstrap
+
+    [OK] 3 new items (bootstrap, @popperjs/core, bootstrap/dist/css/bootstrap.min.css) added to the importmap.php!
+
+La mise à jour a été effectuée uniquement dans `importmap.php`
+
+Pour tester, on va d'abord trouver les templates `bootstrap` à cette adresse : https://symfony.com/doc/current/form/form_themes.html
+
+Donc pour les formulaires `bootstrap`
+
+```yaml
+# config/packages/twig.yaml
+twig:
+form_themes: ['bootstrap_5_horizontal_layout.html.twig']
+# ...
+```
+
+Le code `bootstrap` est généré, mais il manque le style !
+
+dans `assets/app.js` on ajoute le lien vers le `css`
+
+```js
+import './vendor/bootstrap/dist/css/bootstrap.min.css';
+import './styles/app.css';
+```
+Et nos formulaires sont jolis !
+
+On peut utiliser toutes les classes de `bootstrap`
+
+## Manipulation des formulaires
