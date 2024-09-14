@@ -213,3 +213,31 @@ DATABASE_URL="mysql://root:@127.0.0.1:3306/mysecondesymfonyc1?serverVersion=8.0.
 # DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
 # DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 ```
+
+## Création de la DB
+
+Avec Doctrine, documentation :
+
+https://symfony.com/doc/current/doctrine.html
+
+
+    php bin/console doctrine:database:create
+    # le mode raccourci
+    php bin/console d:d:c
+
+La base de donnée devrait être créée si mysql.exe est activé ou Wamp démarré 
+
+## Création d'une entité
+
+Une entité est la représentation objet d'un élément de sauvegarde de données, dans notre cas, en choisissant mysql, il s'agira d'une table
+
+    php bin/console make:entity
+
+```bash
+ php bin/console make:entity Post
+ # ....
+ created: src/Entity/Post.php
+ created: src/Repository/PostRepository.php
+```
+
+Avec seulement l'id de la classe Post
