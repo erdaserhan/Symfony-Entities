@@ -3,7 +3,9 @@
 {% block title %}Section index{% endblock %}
 
 {% block body %}
-    <h1>Section index</h1>
+    <div class="container">
+    <h1 class="display-4">Section index</h1>
+
 
     <table class="table">
         <thead>
@@ -21,8 +23,8 @@
                 <td>{{ section.sectionTitle }}</td>
                 <td>{{ section.sectionDescription }}</td>
                 <td>
-                    <a href="{{ path('app_adminsection_show', {'id': section.id}) }}">show</a>
-                    <a href="{{ path('app_adminsection_edit', {'id': section.id}) }}">edit</a>
+                    <a href="{{ path('app_admin_section_show', {'id': section.id}) }}">show</a>
+                    <a href="{{ path('app_admin_section_edit', {'id': section.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -33,5 +35,7 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_adminsection_new') }}">Create new</a>
+    <button class="btn btn-primary"><a class="text-white" href="{{ path('app_admin_section_new') }}">Create new</a></button>
+    </div>
 {% endblock %}
+
