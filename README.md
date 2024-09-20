@@ -1,4 +1,4 @@
-# Symfony-Entities
+# EntitiesG1
 
 Installation de la version lts (Long Term Support) avec la majorité des bibliothèques pour un site web (`--webapp`)
 
@@ -20,7 +20,7 @@ ou
 
     symfony server:start -d
 
-Pour le fermer 
+Pour le fermer
 
     symfony server:stop
 
@@ -209,7 +209,7 @@ Passez vos paramètres de connexion dans l'ordre
 driver://utilisateur:mot_de_passe@ip_serveur:port/nomdelaDB?options
 
 ```bash
-DATABASE_URL="mysql://root:@127.0.0.1:3306/mysecondesymfonyc1?serverVersion=8.0.31&charset=utf8mb4"
+DATABASE_URL="mysql://root:@127.0.0.1:3306/entitiesg1?serverVersion=8.0.31&charset=utf8mb4"
 # DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
 # DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 ```
@@ -225,7 +225,7 @@ https://symfony.com/doc/current/doctrine.html
     # le mode raccourci
     php bin/console d:d:c
 
-La base de donnée devrait être créée si mysql.exe est activé ou Wamp démarré 
+La base de donnée devrait être créée si mysql.exe est activé ou Wamp démarré
 
 ## Création d'une entité
 
@@ -330,6 +330,7 @@ Ce qui nous crée le fichier suivant :
 
 ```php
 // src/Entity/Post.php
+
 
 <?php
 
@@ -487,7 +488,7 @@ puis
 
     php bin/console d:m:m
 
-    ### Remplissage de Section
+### Remplissage de Section
 
     php bin/console make:entity Section
 
@@ -619,8 +620,7 @@ Et dans Dans `src/Entity/Section.php`
 
 #...
 
-
-  /**
+    /**
      *  Relation M2M vers Post, mais on voit que le 'parent' mappedBy: est
      *  l'attribut sections se trouvant dans POST, c'est l'enfant
      * @var Collection<int, Post>
@@ -678,7 +678,7 @@ Et dans Dans `src/Entity/Section.php`
 
 Nous allons les faire dans une nouvelle branche, car nous n'en aurons pas besoin immédiatement :
 
-    
+
 
 ### Mise en forme des formulaires et des pages avec `bootstrap`
 
@@ -723,4 +723,181 @@ Et nos formulaires sont jolis !
 
 On peut utiliser toutes les classes de `bootstrap`
 
-## Manipulation des formulaires
+### On va compléter les tables présentes
+
+Création des relations et des champs de table :
+
+    php bin/console make:migration
+
+    php bin/console doctrine:migrations:migrate
+
+## Création des 'utilisateurs'
+
+    php bin/console make:user
+
+```bash
+$ php bin/console make:user
+
+ The name of the security user class (e.g. User) [User]: >
+
+ Do you want to store user data in the database (via Doctrine)? (yes/no) [yes]:
+ >
+
+ Enter a property name that will be the unique "display" name for the user (e.g. email, usernam
+e, uuid) [email]:
+ > username
+
+ Will this app need to hash/check user passwords? Choose No if passwords are not needed or will
+ be checked/hashed by some other system (e.g. a single sign-on server).
+
+ Does this app need to hash/check user passwords? (yes/no) [yes]:
+ >
+
+ created: src/Entity/User.php
+ created: src/Repository/UserRepository.php
+ updated: src/Entity/User.php
+ updated: config/packages/security.yaml
+
+
+  Success!
+
+
+ Next Steps:
+   - Review your new App\Entity\User class.
+   - Use make:entity to add more fields to your User entity and then run make:migration.
+   - Create a way to authenticate! See https://symfony.com/doc/current/security.html
+```
+
+Création d'une entité avec la particularité de permettre les connexions `src/Entity/User.php`. On va la modifier
+
+On peut aussi voir la gestion de la sécurité dans `config/packages/security.yaml`:
+
+```twig
+#...
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+# ...
+```
+
+On modifie nos tables pour pouvoir vérifier la cohérence en MySQL
+
+    php bin/console ma:mi
+    php bin/console d:m:m
+
+## Création d'une page de connexion
+
+    php bin/console make:security:form-login
+
+```bash
+php bin/console make:security:form-login
+
+ Choose a name for the controller class (e.g. SecurityController) [SecurityController]:
+ >
+
+ Do you want to generate a '/logout' URL? (yes/no) [yes]:
+ >
+
+ Do you want to generate PHPUnit tests? [Experimental] (yes/no) [no]:
+ >
+
+ created: src/Controller/SecurityController.php
+ created: templates/security/login.html.twig
+ updated: config/packages/security.yaml
+
+
+  Success!
+
+
+ Next: Review and adapt the login template: security/login.html.twig to suit your needs.
+```
+
+```yaml
+# config/packages/security.yaml
+
+# ...
+firewalls:
+  dev:
+    pattern: ^/(_(profiler|wdt)|css|images|js)/
+    security: false
+  main:
+    lazy: true
+    provider: app_user_provider
+    # notre firewall ouvre une porte pour User
+    form_login:
+      login_path: app_login
+      check_path: app_login
+      enable_csrf: true
+    logout:
+      path: app_logout
+# ...
+```
+
+Débogage des routes :
+
+    php bin/console de:r
+
+On va remplir la table `user`
+
+Avec le contenu suivant :
+
+- username
+    1) adminLee
+    2) redacGuy
+    3) userEr
+- roles ! json
+    1) ["ROLE_ADMIN","ROLE_REDAC","ROLE_USER"]
+    2) ["ROLE_REDAC","ROLE_USER"]
+    3) []
+- password : Il va falloir crypter les mots de passes avec
+
+  php bin/console security:hash-password
+
+1) 123admin123
+2) ad123min
+3) adddmin
+
+- user_mail
+  ici, vous choisissez
+- user_real_name
+  ici vous choisissez
+- user_active
+  true
+
+### Ajoutez login/logout au menu
+
+```twig
+{# templates/main/menu.html.twig #}
+<nav>
+    {# on utilise path('nom_du_chemin') lorsqu'on veut un lien vers une page #}
+    <a href="{{ path('homepage') }}">Homepage</a>
+    <a href="{{ path('about_me') }}">About me</a>
+    {# si on est connecté, on affiche la déconnexion (pas de sécurité réelle) #}
+    {% if is_granted('IS_AUTHENTICATED') %}
+    <a href="{{ path('app_logout') }}">Logout</a>
+    {# si pas connecté, lien vers login #}
+    {% else %}
+    <a href="{{ path('app_login') }}">Login</a>
+    {% endif %}
+</nav>
+```
+
+Ceci n'est que la partie front-end, si on souhaite inactiver la possibilité d'aller sur `/login` si on est connecté, on peut le faire au niveau du contrôleur :
+
+`src/Controller/SecurityController.php`
+```php
+# ...
+#[Route(path: '/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
+    {
+
+        // si on est déjà connecté
+        if ($this->getUser()) {
+            // on retourne sur l'accueil
+            return $this->redirectToRoute('homepage');
+        }
+# ...
+```
