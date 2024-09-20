@@ -1,0 +1,14 @@
+{# template du front, hérite de base.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    {% block nav %}
+        {% include 'main/menu.html.twig' %}
+    {% endblock %}
+    {% block header %}
+    {% endblock %}
+    {% block main %}
+    {% endblock %}
+    {% block footer %}
+    {% endblock %}
+{% endblock %}
