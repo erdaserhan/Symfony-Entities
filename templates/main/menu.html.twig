@@ -1,11 +1,13 @@
+<div class="container">
 <nav class="m-2">
-    <a href="{{ path('homepage') }}">Homepage</a>
-    <a href="{{ path('about_me') }}">About me</a>
+    <a href="{{ path('homepage') }}" class="display-6 text-decoration-none me-4">Homepage</a>
+    <a href="{{ path('about_me') }}" class="display-6 text-decoration-none me-4">About me</a>
     {% if is_granted('IS_AUTHENTICATED') %}
-    <a href="{{ path('app_logout') }}">Logout</a>
+    <a href="{{ path('app_logout') }}" class="display-6 text-decoration-none me-2">Logout</a>
     {% else %}
-    <a href="{{ path('app_login') }}">Login</a>
+    <a href="{{ path('app_login') }}" class="display-6 text-decoration-none me-2">Login</a>
     {% endif %}
 
     {# <a href="{{ path('app_admin_article_index') }}">CRUD Article</a> #}
 </nav>
+</div>
