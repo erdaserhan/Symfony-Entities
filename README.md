@@ -20,7 +20,7 @@ ou
 
     symfony server:start -d
 
-Pour le fermer
+Pour le fermer 
 
     symfony server:stop
 
@@ -225,7 +225,7 @@ https://symfony.com/doc/current/doctrine.html
     # le mode raccourci
     php bin/console d:d:c
 
-La base de donnée devrait être créée si mysql.exe est activé ou Wamp démarré
+La base de donnée devrait être créée si mysql.exe est activé ou Wamp démarré 
 
 ## Création d'une entité
 
@@ -678,7 +678,7 @@ Et dans Dans `src/Entity/Section.php`
 
 Nous allons les faire dans une nouvelle branche, car nous n'en aurons pas besoin immédiatement :
 
-
+    
 
 ### Mise en forme des formulaires et des pages avec `bootstrap`
 
@@ -845,15 +845,15 @@ On va remplir la table `user`
 Avec le contenu suivant :
 
 - username
-    1) adminLee
-    2) redacGuy
-    3) userEr
+  1) adminLee
+  2) redacGuy
+  3) userEr
 - roles ! json
-    1) ["ROLE_ADMIN","ROLE_REDAC","ROLE_USER"]
-    2) ["ROLE_REDAC","ROLE_USER"]
-    3) []
+  1) ["ROLE_ADMIN","ROLE_REDAC","ROLE_USER"]
+  2) ["ROLE_REDAC","ROLE_USER"]
+  3) []
 - password : Il va falloir crypter les mots de passes avec
-
+  
   php bin/console security:hash-password
 
 1) 123admin123
@@ -861,11 +861,11 @@ Avec le contenu suivant :
 3) adddmin
 
 - user_mail
-  ici, vous choisissez
+ici, vous choisissez
 - user_real_name
   ici vous choisissez
 - user_active
-  true
+ true
 
 ### Ajoutez login/logout au menu
 
