@@ -6,3 +6,12 @@
 <h1> {{ title }} </h1>
 <p> {{ homepage_text }} </p>
 {% endblock %}
+
+{% block main %}
+    {% for post in section.posts %}
+        <h3>{{ post.postTitle }}</h3>
+
+    {% else %}
+    <h3>Pas encore d'articles</h3>
+    {% endfor %}
+{% endblock %}

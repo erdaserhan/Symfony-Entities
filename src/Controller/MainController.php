@@ -32,7 +32,7 @@ class MainController extends AbstractController
     {
         $section = $sections->find($id);
         return $this->render('main/section.html.twig', [
-            'title' => 'Section '.$section->getSectionTitle(),
+            'title' => 'Section => '.$section->getSectionTitle(),
             'homepage_text' => $section->getSectionDescription(),
             'section' => $section,
             'sections' => $sections->findAll()
