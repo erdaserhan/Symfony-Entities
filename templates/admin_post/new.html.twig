@@ -1,9 +1,13 @@
-{% extends 'base.html.twig' %}
+{% extends 'template.back.html.twig' %}
 
-{% block title %}New Post{% endblock %}
+{% block title %}{{ parent() }} ||{{ title }}{% endblock %}
 
-{% block body %}
-    <h1>Create new Post</h1>
+{% block header %}
+    <h1> {{ title }} </h1>
+    <p> {{ homepage_text }} </p>
+{% endblock %}
+
+{% block main %}
 
     {{ include('admin_post/_form.html.twig') }}
 
