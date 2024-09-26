@@ -21,6 +21,25 @@ class MainController extends AbstractController
         ]);
     }
 
+    //Création de l'url pour le détail d'une section
+    #[Route(
+        path: '/section/{id}',
+        name: 'section',
+        requirements: ['id' => '\d+'],
+        defaults: ['id'=>1])]
+
+    public function section(SectionRepository $sections, int $id): Response
+    {
+        $section = $sections->find($id);
+        return $this->render('main/section.html.twig', [
+            'title' => 'Section '.$section->getSectionTitle(),
+            'homepage_text' => $section->getSectionDescription(),
+            'section' => $section,
+            'sections' => $sections->findAll()
+        ]);
+    }
+
+
     #[Route('/about', name: 'about_me')]
     public function aboutMe(SectionRepository $sections): Response
     {
