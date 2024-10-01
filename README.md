@@ -182,7 +182,7 @@ Changez cette ligne
     APP_SECRET=c6f06c078199d1f00879e1b9c146cddf
 en
 
-    APP_ENV=prod
+    APP_ENV=dev
     APP_SECRET=une_autre_clef_secrete_sécurité
 
 si vous retapez  `php bin/console debug:route`
@@ -901,3 +901,411 @@ Ceci n'est que la partie front-end, si on souhaite inactiver la possibilité d'a
         }
 # ...
 ```
+
+### On va twigger tout ça !
+
+Recherche de template :
+
+https://startbootstrap.com/template/blog-post#google_vignette
+
+Le dossier se trouve dans `datas`
+
+On va partir de `templates/base.html.twig` pour modifier les entêtes, on utilise la balise `{{ asset('assets/mon/chemin/fichier.jpg') }}`
+
+En effet `AssetMapper` va chercher les fichiers publics dans le dossier `assets`, et le compiler à chaque fois (tant qu'on est en développement)
+
+Exemple pour le fichier `template/base.html.twig`
+
+```twig
+{# template/base.html.twig #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    {# pour un bootstrap responsive #}
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <title>{% block title %}EntitiesG1{% endblock %}</title>
+        <!-- Favicon-->
+        {# icone se trouvant dans le dossier `assets` #}
+        <link rel="icon" type="image/x-icon" href="{{ asset('img/favicon.ico') }}" />
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {# utilisation de ASSETMAPPER #}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+    {#  notre contenu (nos templates #}
+    {% block content %}
+    {% endblock %}
+    {# contenu automatique des cruds, form etc... #}
+    {% block body %}
+    {% endblock %}
+    </body>
+</html>
+
+```
+
+Dans `templates/main/menu.html.twig`
+
+```twig
+        {# si nous sommes connectés #}
+                {% if is_granted('IS_AUTHENTICATED') %}
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a></li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                <li class="nav-item"><a class="nav-link" href="#">Administration</a></li>
+                    {% endif %}
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Connexion</a></li>
+                {% endif %}
+```
+
+## Mise en place ardue du template
+
+Il faut utiliser un nombre de block adéquat pour nos pages de front
+
+### Créer un contrôleur d'administration
+
+  php bin/console make:controller AdminController
+  
+Une route vers un dossier `admin` a été créée, on va vérifier si un rôle lui est attribué dans le fichier `config/packages/security.yaml`
+
+```yaml
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
+```
+
+Dorénavant, ce dossier (et sous-dossiers sont accessibles que par les `ROLE_ADMIN`)
+
+https://symfony.com/doc/current/security.html#roles
+
+## Création d'un contrôleur pour Admin
+
+    php bin/console make:controller AdminController
+
+On modifie le fichier pour passer certaines variables :
+
+`src/Controller/AdminController.php`
+```php
+# ...
+#[Route('/admin', name: 'app_admin')]
+    public function index(): Response
+    {
+        return $this->render('admin/index.html.twig', [
+            'title' => 'Administration',
+            'homepage_text' => "Bienvenue {$this->getUser()->getUsername()}",
+        ]);
+    }
+# ...
+```
+
+On duplique `templates/template.front.html.twig` en `templates/template.back.html.twig`. On modifiera ce template suivant les besoins.
+
+On modifie `templates/admin/index.html.twig` pour le faire correspondre aux variables du contrôleur
+
+```twig
+{% extends 'template.back.html.twig' %}
+
+{% block title %}{{ parent() }} | {{ title }}{% endblock %}
+
+{% block header %}
+    <h1>{{ title }}</h1>
+    <p>{{ homepage_text }}</p>
+{% endblock %}
+```
+
+## Modification des menus
+
+Suivant que l'on soit en front `templates/main/_menu.html.twig` ou en back `templates/admin/_menu.admin.html.twig`
+
+## Création du CRUD pour `Section`
+
+```bash
+php bin/console make:crud
+
+ The class name of the entity to create CRUD (e.g. AgreeableChef):
+ > Section
+Section
+
+ Choose a name for your controller class (e.g. SectionController) [SectionController]:
+ > AdminSectionController
+
+ Do you want to generate PHPUnit tests? [Experimental] (yes/no) [no]:
+ >
+
+ created: src/Controller/AdminSectionController.php
+ created: src/Form/SectionType.php
+ created: templates/admin_section/_delete_form.html.twig
+ created: templates/admin_section/_form.html.twig
+ created: templates/admin_section/edit.html.twig
+ created: templates/admin_section/index.html.twig
+ created: templates/admin_section/new.html.twig
+ created: templates/admin_section/show.html.twig
+
+
+  Success!
+
+
+ Next: Check your new CRUD by going to /admin/section/
+```
+
+On crée les liens dans la page d'accueil et le menu de l'admin vers 
+
+    <a href="{{ path('app_admin_section_index') }}">Crud Section</a>
+
+Ne pas oublier de mettre en commentaire une partie du formulaire `src/Form/SectionType.php`
+
+```php
+<?php
+
+namespace App\Form;
+
+use App\Entity\Post;
+use App\Entity\Section;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class SectionType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('sectionTitle')
+            ->add('sectionDescription')
+            /*->add('posts', EntityType::class, [
+                'class' => Post::class,
+                'choice_label' => 'id',
+                'multiple' => true,
+            ])*/
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Section::class,
+        ]);
+    }
+}
+
+```
+
+## Affichage des sections sur le front
+
+Dans `src/Controller/MainController.php`
+
+```php
+# ....
+# appel du gestionnaire de section
+use App\Repository\SectionRepository;
+# ...
+// Création de l'url pour le détail d'une section
+    #[Route(
+        # chemin vers la section avec son id
+        path: '/section/{id}',
+        # nom du chemin
+        name: 'section',
+        # accepte l'id au format int positif uniquement
+        requirements: ['id' => '\d+'],
+        # si absent, donne 1 comme valeur par défaut
+        defaults: ['id'=>1])]
+
+    public function section(SectionRepository $sections, int $id): Response
+    {
+        // récupération de la section
+        $section = $sections->find($id);
+        return $this->render('main/section.html.twig', [
+            'title' => 'Section '.$section->getSectionTitle(),
+            'homepage_text'=> $section->getSectionDescription(),
+            'section' => $section,
+            'sections' => $sections->findAll(),
+        ]);
+    }
+    #...
+
+```
+
+Et dans le menu `templates/main/_menu.html.twig`
+
+```twig
+{# on va afficher les liens vers nos section #}
+              {% for section in sections %}
+                <li class="nav-item"><a class="nav-link" href="{{ path('section',{id:section.id}) }}">{{ section.sectionTitle }}</a></li>
+              {% endfor %}
+```
+
+### Création du template
+
+```twig
+{# templates/main/section.html.twig #}
+{% extends 'template.front.html.twig' %}
+
+{# on surcharge le block parent #}
+{% block title %}{{ parent() }} | {{ title }}{% endblock %}
+
+{% block header %}
+<h1>{{ title }}</h1>
+    <p>{{ homepage_text }}</p>
+{% endblock %}
+% block main %}
+     {% for post in section.posts %}
+        <h3>{{ post.postTitle }}</h3>
+         <p>Ecrit par {{ post.user.username }} le
+             {{ post.postDateCreated|date("d/m/Y \à H:i") }}</p>
+         <p>{{ post.postText }}</p>
+    <p>
+         {% for section in post.sections %}
+             <a href="{{ path('section',{id:section.id}) }}">{{ section.SectionTitle }}</a>
+         {% else %}
+             <h3>Pas encore de section</h3>
+         {%  endfor %}
+             </p>
+    {% else %}
+    <h3>Pas encore d'articles</h3>
+    {% endfor %}
+
+{% endblock %}
+
+```
+
+## Création du CRUD de Post
+
+```bash
+php bin/console make:crud
+
+ The class name of the entity to create CRUD (e.g. FierceChef):
+ > Post
+Post
+
+ Choose a name for your controller class (e.g. PostController) [PostController]:
+ > AdminPostController
+
+ Do you want to generate PHPUnit tests? [Experimental] (yes/no) [no]:
+ >
+
+ created: src/Controller/AdminPostController.php
+ created: src/Form/PostType.php
+ created: templates/admin_post/_delete_form.html.twig
+ created: templates/admin_post/_form.html.twig
+ created: templates/admin_post/edit.html.twig
+ created: templates/admin_post/index.html.twig
+ created: templates/admin_post/new.html.twig
+ created: templates/admin_post/show.html.twig
+
+
+  Success!
+
+
+ Next: Check your new CRUD by going to /admin/post/
+
+```
+
+On a un problème avec les tags :
+
+`src/Form/PostType.php`
+
+```php
+<?php
+
+namespace App\Form;
+
+use App\Entity\Post;
+use App\Entity\Section;
+use App\Entity\Tag;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class PostType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('postTitle')
+            ->add('postText')
+            ->add('postDateCreated', null, [
+                'widget' => 'single_text',
+                # non obligatoire
+                'required' => false,
+                # si vide on envoie la date du jour
+                'empty_data' => date('Y-m-d H:i:s'),
+            ])
+            ->add('postDatePublished', null, [
+                'widget' => 'single_text',
+            ])
+            ->add('postIsPublished')
+            ->add('sections', EntityType::class, [
+                'class' => Section::class,
+                # choix du titre dans les checkboxes
+                'choice_label' => 'sectionTitle',
+                'multiple' => true,
+                'expanded' => true,
+            ])
+            # on peut se passer des tags pour le moment
+            /*->add('tags', EntityType::class, [
+                'class' => Tag::class,
+                'choice_label' => 'id',
+                'multiple' => true,
+                'required' => false,
+            ])*/
+            ->add('user', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'username',
+            ])
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Post::class,
+        ]);
+    }
+}
+
+```
+
+et on va modifier l'insertion de `src/Controller/AdminPostController.php` pour avoir une date par défaut et éviter une erreur lors de l'insertion d'un nouveau Post
+
+```php
+#[Route('/new', name: 'app_admin_post_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $post = new Post();
+        // on veut une date de création sans formulaire
+        $post->setPostDateCreated(new \DateTime());
+        $form = $this->createForm(PostType::class, $post);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($post);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_admin_post_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('admin_post/new.html.twig', [
+            'post' => $post,
+            'form' => $form,
+            'title' => 'New Post',
+            'homepage_text' => "Administration des Posts par {$this->getUser()->getUsername()}",
+        ]);
+
+```
+
+## On doit modifier nos Crud de Post
+
+Pour avoir notre template, on peut commencer à faire les entêtes :
+
+`templates/admin_post/index.html.twig` pour les 4 éléments du CRUD
+
+Puis les liens depuis l'admin
