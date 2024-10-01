@@ -43,7 +43,7 @@ final class AdminPostController extends AbstractController
         return $this->render('admin_post/new.html.twig', [
             'post' => $post,
             'form' => $form,
-            'title' => 'Posts',
+            'title' => 'New Post',
             'homepage_text' => "Administration des Posts par {$this->getUser()->getUsername()}",
         ]);
     }
@@ -53,7 +53,7 @@ final class AdminPostController extends AbstractController
     {
         return $this->render('admin_post/show.html.twig', [
             'post' => $post,
-            'title' => 'Posts',
+            'title' => 'Post',
             'homepage_text' => "Administration des Posts par {$this->getUser()->getUsername()}",
         ]);
     }
@@ -73,7 +73,7 @@ final class AdminPostController extends AbstractController
         return $this->render('admin_post/edit.html.twig', [
             'post' => $post,
             'form' => $form,
-            'title' => 'Edit Posts :',
+            'title' => "Edit Post : {$post->getPostTitle()}",
             'homepage_text' => "Administration des Posts par {$this->getUser()->getUsername()}",
         ]);
     }
