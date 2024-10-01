@@ -17,7 +17,9 @@ class MainController extends AbstractController
     #[Route('/', name: 'homepage')]
     public function index(SectionRepository $sections, EntityManagerInterface $em): Response
     {
-        $posts = $em->getRepository(Post::class)->findAll();
+        $posts = $em->getRepository(Post::class)->findBy(['postIsPublished'=>true], ['postDatePublished'=>'DESC']);
+        // dump and die, débug mais arrête le script
+        // dd($posts);
         return $this->render('main/index.html.twig', [
             'title' => 'Homepage',
             'homepage_text' => "Nous sommes le ".date('d/m/Y \à H:i'),
